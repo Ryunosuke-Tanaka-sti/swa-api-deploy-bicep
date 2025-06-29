@@ -1,0 +1,30 @@
+{
+    "name": "Azure SWA include API & Bicep Development",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/azure-cli:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    // npm@11.4.2に関してはnoticeが出ていたので対応
+    "postCreateCommand": "npm install -g npm@11.4.2 @azure/static-web-apps-cli azure-functions-core-tools@4 prettier",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-bicep",
+                "GitHub.vscode-github-actions",
+                "ms-vscode.azure-account",
+                "bradlc.vscode-tailwindcss",
+                "esbenp.prettier-vscode",
+                "rvest.vs-code-prettier-eslint"
+            ]
+        }
+    },
+    "forwardPorts": [
+        3000,
+        7071,
+        4280
+    ],
+    "mounts": [
+        "source=${localEnv:HOME}/.azure,target=/home/node/.azure,type=bind,consistency=cached"
+    ]
+}
