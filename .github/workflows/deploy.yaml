@@ -26,13 +26,16 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
+      - name: Copy Static Web App Configuration
+        run: |
+          cp frontend/config/prod/staticwebapp.config.json frontend/out/staticwebapp.config.json
+
       - name: Upload Frontend Build Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: |
             frontend/out/
-            frontend/config/prod/staticwebapp.config.json
           retention-days: 1
 
   # APIビルドジョブ
@@ -73,8 +76,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      APP_LOCATION: ${{ vars.APP_LOCATION || 'deploy' }}
-      OUTPUT_LOCATION: ${{ vars.OUTPUT_LOCATION || 'frontend' }}
+      APP_LOCATION: ${{ vars.APP_LOCATION || 'deploy/frontend' }}
+      OUTPUT_LOCATION: ${{ vars.OUTPUT_LOCATION || 'out' }}
       API_LOCATION: ${{ vars.API_LOCATION || 'deploy/api' }}
 
     steps:
@@ -108,6 +111,6 @@ jobs:
           action: "upload"
           app_location: ${{ env.APP_LOCATION }}
           api_location: ${{ env.API_LOCATION }}
-          output_location: ${{ env.OUTPUT_LOCATION }}
+          output_location: "${{ env.OUTPUT_LOCATION }}"
           skip_app_build: true
           skip_api_build: true
