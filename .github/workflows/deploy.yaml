@@ -73,9 +73,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      APP_LOCATION: ${{ vars.APP_LOCATION || 'deploy/api' }}
-      OUTPUT_LOCATION: ${{ vars.OUTPUT_LOCATION || 'deploy/out' }}
-      API_LOCATION: ${{ vars.API_LOCATION || '' }}
+      APP_LOCATION: ${{ vars.APP_LOCATION || 'deploy' }}
+      OUTPUT_LOCATION: ${{ vars.OUTPUT_LOCATION || 'frontend' }}
+      API_LOCATION: ${{ vars.API_LOCATION || 'deploy/api' }}
 
     steps:
       - name: Checkout Repository

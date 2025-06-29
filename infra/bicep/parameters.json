@@ -15,13 +15,13 @@
       "value": "main"
     },
     "appLocation": {
-      "value": "deploy/frontend"
+      "value": "deploy"
     },
     "apiLocation": {
       "value": "deploy/api"
     },
     "outputLocation": {
-      "value": "."
+      "value": "frontend"
     }
   }
 }
