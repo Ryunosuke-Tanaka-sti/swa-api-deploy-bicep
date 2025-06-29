@@ -3,19 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "staticWebAppName": {
-      "value": "my-swa-app"
+      "value": "swa-api-deploy-bicep"
     },
     "location": {
       "value": "East Asia"
     },
     "repositoryUrl": {
-      "value": "https://github.com/your-username/your-repo-name"
+      "value": "https://github.com/Ryunosuke-Tanaka-sti/swa-api-deploy-bicep"
     },
     "branch": {
       "value": "main"
-    },
-    "repositoryToken": {
-      "value": "YOUR_GITHUB_PERSONAL_ACCESS_TOKEN"
     },
     "appLocation": {
       "value": "frontend"
