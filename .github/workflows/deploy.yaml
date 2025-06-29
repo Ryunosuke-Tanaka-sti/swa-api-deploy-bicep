@@ -30,7 +30,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: front/out/
+          path: |
+            frontend/out/
+            frontend/config/prod/staticwebapp.config.json
           retention-days: 1
 
   # APIビルドジョブ
@@ -69,7 +71,7 @@ jobs:
   deploy-swa:
     needs: [build-frontend, build-api]
     runs-on: ubuntu-latest
-    # 手動実行時のみデプロイ実行
+    environment: production
 
     steps:
       - name: Checkout Repository
@@ -79,13 +81,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: frontend-build
-          path: ./deploy/front
+          path: ./frontend/out
 
       - name: Download API Artifacts
         uses: actions/download-artifact@v4
         with:
           name: api-build
-          path: ./deploy/api
+          path: ./api/dist
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
@@ -93,7 +95,8 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "./deploy/front"
-          api_location: "./deploy/api"
+          app_location: ${{vars.APP_LOCATION}}
+          api_location: ${{vars.API_LOCATION}}
+          output_location: ${{vars.OUTPUT_LOCATION}}
           skip_app_build: true
           skip_api_build: true
