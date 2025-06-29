@@ -52,9 +52,13 @@ jobs:
           cache: "npm"
           cache-dependency-path: "api/package-lock.json"
 
-      - name: Install API Dependencies
+      - name: Build API
         working-directory: ./api
-        run: npm ci
+        run: npm run build
+
+      - name: Run API Tests
+        working-directory: ./api
+        run: npm run test
 
       # ここでAPIのテストする
 
