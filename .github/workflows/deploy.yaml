@@ -93,6 +93,13 @@ jobs:
           name: api-build
           path: ./deploy/api
 
+      - name: check
+        working-directory: ./deploy
+        run: |
+          ls -la
+          ls -la frontend
+          ls -la api
+
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
