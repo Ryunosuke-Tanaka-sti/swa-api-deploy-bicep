@@ -68,6 +68,7 @@ jobs:
             api/dist/
             api/host.json
             api/package.json
+            api/node_modules/
           retention-days: 1
 
   # Azure Static Web Appsデプロイジョブ
@@ -99,8 +100,6 @@ jobs:
       - name: check
         working-directory: ./deploy
         run: |
-          ls -la
-          ls -la frontend
           ls -la api
 
       - name: Deploy to Azure Static Web Apps
