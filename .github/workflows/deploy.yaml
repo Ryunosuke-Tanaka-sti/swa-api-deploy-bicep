@@ -88,3 +88,4 @@ jobs:
           api_location: ${{ env.API_LOCATION }}
           output_location: "${{ env.OUTPUT_LOCATION }}"
           skip_app_build: true
+          skip_api_build: false
