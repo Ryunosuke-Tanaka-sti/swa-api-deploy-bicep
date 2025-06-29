@@ -56,20 +56,7 @@ jobs:
         working-directory: ./api
         run: npm ci
 
-      - name: Build API
-        working-directory: ./api
-        run: npm run build
-
-      - name: Upload API Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-build
-          path: |
-            api/dist/
-            api/host.json
-            api/package.json
-            api/node_modules/
-          retention-days: 1
+      # ここでAPIのテストする
 
   # Azure Static Web Appsデプロイジョブ
   deploy-swa:
@@ -91,17 +78,6 @@ jobs:
           name: frontend-build
           path: ./deploy/frontend
 
-      - name: Download API Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: api-build
-          path: ./deploy/api
-
-      - name: check
-        working-directory: ./deploy
-        run: |
-          ls -la api
-
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -112,4 +88,3 @@ jobs:
           api_location: ${{ env.API_LOCATION }}
           output_location: "${{ env.OUTPUT_LOCATION }}"
           skip_app_build: true
-          skip_api_build: true
