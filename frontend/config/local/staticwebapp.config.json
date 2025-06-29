@@ -14,5 +14,8 @@
       "redirect": "/.auth/login/github",
       "statusCode": 302
     }
+  },
+  "platform": {
+    "apiRuntime": "node:18"
   }
 }
