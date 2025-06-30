@@ -53,23 +53,7 @@ resource staticWebAppSettings 'Microsoft.Web/staticSites/config@2022-03-01' = {
   parent: staticWebApp
   properties: {
     GITHUB_CLIENT_ID: githubClientId
-    GITHUB_CLIENT_SECRET: githubClientSecret
-  }
-}
-
-resource functionAppSettings 'Microsoft.Web/staticSites/config@2022-03-01' = {
-  parent: staticWebApp
-  name: 'functionappsettings'
-  properties: {
-    // 最小限の設定（Programming Model v4では自動認識）
-    FUNCTIONS_EXTENSION_VERSION: '~4'
-    FUNCTIONS_WORKER_RUNTIME: 'node'
-    
-    // Node.js バージョン指定（オプション）
-    WEBSITE_NODE_DEFAULT_VERSION: '~18'
-    
-    // カスタム設定（必要に応じて）
-    // MY_CUSTOM_SETTING: 'value'
+    GITHUB_PROVIDER_AUTHENTICATION_SECRET: githubClientSecret
   }
 }
 

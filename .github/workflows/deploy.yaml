@@ -26,10 +26,6 @@ jobs:
         working-directory: ./frontend
         run: npm run build
 
-      - name: Copy Static Web App Configuration
-        run: |
-          cp frontend/config/prod/staticwebapp.config.json frontend/out/staticwebapp.config.json
-
       - name: Upload Frontend Build Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -79,6 +75,12 @@ jobs:
         with:
           name: frontend-build
           path: ./deploy/frontend
+      - name: Copy Static Web App Configuration
+        run: |
+          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/out/staticwebapp.config.json
+      - name: check
+        working-directory: ./deploy/frontend/out
+        run: ls -la
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
