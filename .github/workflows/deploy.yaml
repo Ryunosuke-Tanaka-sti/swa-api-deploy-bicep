@@ -81,10 +81,12 @@ jobs:
           path: ./deploy/frontend
       - name: Copy Static Web App Configuration
         run: |
-          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/out/
+          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/
       - name: check
-        working-directory: ./deploy/frontend/out
-        run: ls -la
+        working-directory: ./deploy/frontend/
+        run: |
+          ls -la
+          ls -la out
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
