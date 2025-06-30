@@ -81,7 +81,7 @@ jobs:
           path: ./deploy/frontend
       - name: Copy Static Web App Configuration
         run: |
-          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/out/staticwebapp.config.json
+          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/out/
       - name: check
         working-directory: ./deploy/frontend/out
         run: ls -la
