@@ -67,8 +67,8 @@ jobs:
     environment: production
     env:
       APP_LOCATION: ${{ vars.APP_LOCATION || 'deploy/frontend' }}
-      OUTPUT_LOCATION: ${{ vars.OUTPUT_LOCATION || 'out' }}
-      API_LOCATION: ${{ vars.API_LOCATION || 'deploy/api' }}
+      OUTPUT_LOCATION: ${{ vars.OUTPUT_LOCATION || '.' }}
+      API_LOCATION: ${{ vars.API_LOCATION || 'api' }}
 
     steps:
       - name: Checkout Repository
@@ -86,7 +86,6 @@ jobs:
         working-directory: ./deploy/frontend/
         run: |
           ls -la
-          ls -la out
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
