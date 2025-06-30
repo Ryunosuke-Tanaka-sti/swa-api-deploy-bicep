@@ -31,8 +31,8 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-03-01' = {
   name: staticWebAppName
   location: location
   sku: {
-    name: 'Free'
-    tier: 'Free'
+    name: 'Standard'
+    tier: 'Standard'
   }
   properties: {
     repositoryUrl: repositoryUrl
@@ -53,7 +53,7 @@ resource staticWebAppSettings 'Microsoft.Web/staticSites/config@2022-03-01' = {
   parent: staticWebApp
   properties: {
     GITHUB_CLIENT_ID: githubClientId
-    GITHUB_PROVIDER_AUTHENTICATION_SECRET: githubClientSecret
+    GITHUB_CLIENT_SECRET: githubClientSecret
   }
 }
 
