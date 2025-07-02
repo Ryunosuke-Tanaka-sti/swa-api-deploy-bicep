@@ -13,6 +13,22 @@ permissions:
   issues: write
 
 jobs:
+  # ブランチ名のサニタイズ処理（共通）
+  sanitize_branch_name:
+    if: startsWith(github.head_ref, 'feature/')
+    runs-on: ubuntu-latest
+    outputs:
+      sanitized_name: ${{ steps.sanitize.outputs.sanitized_name }}
+    steps:
+      - name: Sanitize branch name
+        id: sanitize
+        run: |
+          # feature/user-auth-fix → user-auth-fix
+          BRANCH_NAME="${{ github.head_ref }}"
+          SANITIZED=$(echo "${BRANCH_NAME#feature/}" | sed 's/[^a-zA-Z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g' | tr '[:upper:]' '[:lower:]')
+          echo "sanitized_name=${SANITIZED}" >> $GITHUB_OUTPUT
+          echo "Environment name: ${SANITIZED}"
+
   build-frontend:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
@@ -45,7 +61,7 @@ jobs:
 
   # プレビュー環境のビルド・デプロイ
   build_and_deploy_preview:
-    needs: [build-frontend]
+    needs: [build-frontend, sanitize_branch_name]
     # feature ブランチのPRのみ対象
     if: github.event.action != 'closed' && startsWith(github.head_ref, 'feature/')
     runs-on: ubuntu-22.04
@@ -82,9 +98,12 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/frontend"
-          api_location: "api"
-          output_location: "out"
+          app_location: ${{ env.APP_LOCATION }}
+          api_location: ${{ env.API_LOCATION }}
+          output_location: "${{ env.OUTPUT_LOCATION }}"
+          skip_app_build: true
+          skip_api_build: false
+          deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
           # プレビュー環境として作成（deployment_environment を指定しない場合、PRベースの環境が作成される）
 
       - name: Comment preview URL
@@ -111,6 +130,7 @@ jobs:
   # プレビュー環境のクリーンアップ
   cleanup_preview:
     # PRクローズ時かつfeatureブランチの場合のみ
+    needs: [sanitize_branch_name]
     if: github.event.action == 'closed' && startsWith(github.head_ref, 'feature/')
     runs-on: ubuntu-22.04
     name: Cleanup Preview Environment
@@ -122,6 +142,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
           app_location: "/frontend"
+          deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
 
       - name: Comment cleanup confirmation
         uses: actions/github-script@v6
