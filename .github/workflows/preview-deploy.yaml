@@ -61,6 +61,19 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - name: Download Frontend Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ./deploy/frontend
+      - name: Copy Static Web App Configuration
+        run: |
+          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/
+      - name: check
+        working-directory: ./deploy/frontend/
+        run: |
+          ls -la
+          cat staticwebapp.config.json
 
       - name: Build And Deploy Preview
         id: builddeploy
