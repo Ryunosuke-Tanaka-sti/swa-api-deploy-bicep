@@ -2,14 +2,12 @@ name: Preview Environment - Frontend
 
 on:
   pull_request:
-	  # ここで定義しておけば、PR内でpushしても同期する
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
       - develop
 
 jobs:
-
   build-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -77,13 +75,13 @@ jobs:
           script: |
             const deploymentUrl = '${{ steps.builddeploy.outputs.static_web_app_url }}';
             const comment = `## 🚀 Preview Environment Ready!
-            
+
             Your preview environment has been deployed successfully!
-            
+
             **Preview URL:** ${deploymentUrl}
-            
+
             This environment will be automatically updated when you push new commits to this PR and deleted when the PR is closed.`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -111,11 +109,11 @@ jobs:
         with:
           script: |
             const comment = `## 🧹 Preview Environment Cleaned Up
-            
+
             The preview environment for this PR has been successfully deleted.
-            
+
             Thank you for your contribution! 🎉`;
-            
+
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -140,12 +138,12 @@ jobs:
               state: 'open',
               head: 'feature/'
             });
-            
+
             const featurePRs = prs.filter(pr => pr.head.ref.startsWith('feature/'));
             const count = featurePRs.length;
-            
+
             console.log(`Current active feature PRs: ${count}`);
-            
+
             if (count > 8) {
               const warning = `⚠️ **Warning**: Currently ${count} feature PRs are active.
               
