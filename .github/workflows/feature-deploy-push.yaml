@@ -1,0 +1,166 @@
+# .github/workflows/preview-push-delete.yml
+name: Preview Environment - Push & Delete
+
+on:
+  push:
+    branches:
+      - "feature/**"
+  delete:
+
+permissions:
+  contents: read
+
+jobs:
+  # ブランチ名のサニタイズ処理
+  sanitize_branch_name:
+    if: |
+      (github.event_name == 'push' && startsWith(github.ref_name, 'feature/')) ||
+      (github.event_name == 'delete' && github.event.ref_type == 'branch' && startsWith(github.event.ref, 'feature/'))
+    runs-on: ubuntu-latest
+    outputs:
+      sanitized_name: ${{ steps.sanitize.outputs.sanitized_name }}
+      branch_name: ${{ steps.get_branch.outputs.branch_name }}
+      event_type: ${{ steps.get_branch.outputs.event_type }}
+    steps:
+      - name: Get branch name and event type
+        id: get_branch
+        run: |
+          if [ "${{ github.event_name }}" = "delete" ]; then
+            echo "branch_name=${{ github.event.ref }}" >> $GITHUB_OUTPUT
+            echo "event_type=delete" >> $GITHUB_OUTPUT
+          else
+            echo "branch_name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "event_type=push" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Sanitize branch name
+        id: sanitize
+        run: |
+          BRANCH_NAME="${{ steps.get_branch.outputs.branch_name }}"
+          SANITIZED=$(echo "${BRANCH_NAME#feature/}" | sed 's/[^a-zA-Z0-9-]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g' | tr '[:upper:]' '[:lower:]')
+          echo "sanitized_name=${SANITIZED}" >> $GITHUB_OUTPUT
+          echo "Event: ${{ steps.get_branch.outputs.event_type }}"
+          echo "Branch: ${BRANCH_NAME}"
+          echo "Environment name: ${SANITIZED}"
+
+  build-frontend:
+    needs: [sanitize_branch_name]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js for Frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: "frontend/package-lock.json"
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Upload Frontend Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ needs.sanitize_branch_name.outputs.sanitized_name }}
+          path: |
+            frontend/out/
+          retention-days: 3
+
+  # プレビュー環境のビルド・デプロイ（push時のみ）
+  build_and_deploy_preview:
+    needs: [build-frontend, sanitize_branch_name]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-22.04
+    name: Build and Deploy Named Preview Environment
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+
+      - name: Build And Deploy Preview
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "/frontend"
+          api_location: "api"
+          output_location: "out"
+          deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
+
+      - name: Display deployment info
+        run: |
+          echo "🚀 Feature branch deployed successfully!"
+          echo "Branch: ${{ needs.sanitize_branch_name.outputs.branch_name }}"
+          echo "Environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}"
+          echo "URL: ${{ steps.builddeploy.outputs.static_web_app_url }}"
+
+  # プレビュー環境のクリーンアップ（delete時のみ）
+  cleanup_preview:
+    needs: [sanitize_branch_name]
+    if: github.event_name == 'delete'
+    runs-on: ubuntu-22.04
+    name: Cleanup Named Preview Environment
+    environment: production
+    steps:
+      - name: Close Preview Environment
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          action: "close"
+          deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
+          app_location: "deploy/frontend"
+        #   app_locationは必要ない可能性があるが、literでErrorが出るためパラメータとしてrequiredの可能性あり
+
+      - name: Log cleanup completion
+        run: |
+          echo "🧹 Feature branch environment cleaned up!"
+          echo "Deleted branch: ${{ needs.sanitize_branch_name.outputs.branch_name }}"
+          echo "Cleaned environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}"
+
+  # 環境状態の通知（オプション）
+  notify_status:
+    needs: [sanitize_branch_name, build_and_deploy_preview, cleanup_preview]
+    if: always() && (success() || failure())
+    runs-on: ubuntu-latest
+    name: Notify Environment Status
+    steps:
+      - name: Prepare notification
+        id: prepare
+        run: |
+          if [ "${{ needs.sanitize_branch_name.outputs.event_type }}" = "push" ]; then
+            if [ "${{ needs.build_and_deploy_preview.result }}" = "success" ]; then
+              echo "status=✅ Deployed" >> $GITHUB_OUTPUT
+              echo "message=Feature environment successfully deployed" >> $GITHUB_OUTPUT
+            else
+              echo "status=❌ Failed" >> $GITHUB_OUTPUT
+              echo "message=Feature environment deployment failed" >> $GITHUB_OUTPUT
+            fi
+          else
+            if [ "${{ needs.cleanup_preview.result }}" = "success" ]; then
+              echo "status=🧹 Cleaned" >> $GITHUB_OUTPUT
+              echo "message=Feature environment successfully cleaned up" >> $GITHUB_OUTPUT
+            else
+              echo "status=❌ Failed" >> $GITHUB_OUTPUT
+              echo "message=Feature environment cleanup failed" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Log final status
+        run: |
+          echo "${{ steps.prepare.outputs.status }}: ${{ steps.prepare.outputs.message }}"
+          echo "Branch: ${{ needs.sanitize_branch_name.outputs.branch_name }}"
+          echo "Environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}"
+          echo "Event: ${{ needs.sanitize_branch_name.outputs.event_type }}"
