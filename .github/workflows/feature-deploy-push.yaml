@@ -88,6 +88,20 @@ jobs:
           submodules: true
           lfs: false
 
+      - name: Download Frontend Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ./deploy/frontend
+      - name: Copy Static Web App Configuration
+        run: |
+          cp frontend/config/prod/staticwebapp.config.json deploy/frontend/
+      - name: check
+        working-directory: ./deploy/frontend/
+        run: |
+          ls -la
+          cat staticwebapp.config.json
+
       - name: Build And Deploy Preview
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -95,7 +109,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/frontend"
+          app_location: "deploy/frontend"
           api_location: "api"
           output_location: "out"
           deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
@@ -121,8 +135,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
           deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
-          app_location: "deploy/frontend"
-        #   app_locationは必要ない可能性があるが、literでErrorが出るためパラメータとしてrequiredの可能性あり
+          app_location: "/frontend"
 
       - name: Log cleanup completion
         run: |
