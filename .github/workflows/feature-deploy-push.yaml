@@ -134,8 +134,10 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           action: "close"
+          app_location: "deploy/frontend"
+          api_location: "api"
+          output_location: "out"
           deployment_environment: ${{ needs.sanitize_branch_name.outputs.sanitized_name }}
-          app_location: "/frontend"
 
       - name: Log cleanup completion
         run: |
