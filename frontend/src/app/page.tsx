@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useAuth } from '@/hooks/useAuth';
-import { useState } from 'react';
+import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 interface ApiUserInfo {
   userId: string;
@@ -30,12 +30,12 @@ export default function HomePage() {
     setApiData(null);
 
     try {
-      const response = await fetch('/api/user-info', {
-        method: 'GET',
+      const response = await fetch("/api/user-info", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include', // 認証情報を含める
+        credentials: "include", // 認証情報を含める
       });
 
       if (!response.ok) {
@@ -44,14 +44,16 @@ export default function HomePage() {
 
       const data: ApiUserInfo | ApiError = await response.json();
 
-      if ('error' in data) {
+      if ("error" in data) {
         setApiError(data.message || data.error);
       } else {
         setApiData(data);
       }
     } catch (error) {
-      console.error('API呼び出しエラー:', error);
-      setApiError(error instanceof Error ? error.message : 'APIの呼び出しに失敗しました');
+      console.error("API呼び出しエラー:", error);
+      setApiError(
+        error instanceof Error ? error.message : "APIの呼び出しに失敗しました"
+      );
     } finally {
       setApiLoading(false);
     }
@@ -73,7 +75,7 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-8">
-            Next.js 15 + Azure SWA
+            Next.js 15 + Azure SWA(Preview Buildテスト)
           </h1>
           <p className="text-xl text-gray-600 mb-12">
             GitHub認証を使用したセキュアなWebアプリケーション
@@ -93,7 +95,9 @@ export default function HomePage() {
 
                 {user && (
                   <div className="bg-gray-50 rounded-lg p-4 text-left max-w-md mx-auto">
-                    <h3 className="font-medium text-gray-800 mb-2">ユーザー情報（クライアント側）</h3>
+                    <h3 className="font-medium text-gray-800 mb-2">
+                      ユーザー情報（クライアント側）
+                    </h3>
                     {user.name && (
                       <p className="text-sm text-gray-600">
                         <span className="font-medium">名前:</span> {user.name}
@@ -101,12 +105,14 @@ export default function HomePage() {
                     )}
                     {user.email && (
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">メール:</span> {user.email}
+                        <span className="font-medium">メール:</span>{" "}
+                        {user.email}
                       </p>
                     )}
                     {user.login && (
                       <p className="text-sm text-gray-600">
-                        <span className="font-medium">ログイン:</span> {user.login}
+                        <span className="font-medium">ログイン:</span>{" "}
+                        {user.login}
                       </p>
                     )}
                   </div>
@@ -142,8 +148,16 @@ export default function HomePage() {
                   onClick={login}
                   className="bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition duration-200 flex items-center space-x-2 mx-auto"
                 >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   <span>GitHubでログイン</span>
                 </button>
@@ -171,8 +185,18 @@ export default function HomePage() {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                      />
                     </svg>
                     <span>サーバーからユーザー情報を取得</span>
                   </>
@@ -187,23 +211,62 @@ export default function HomePage() {
               )}
 
               {apiData && (
-                <div className={" rounded-lg p-4 text-left max-w-md mx-auto" +
-                 (apiData.isAuthenticated ? ' bg-green-50 border border-green-200' : ' bg-red-50 border border-red-200')}
-                 >
-                  <h3 className={"font-medium  mb-2" + (apiData.isAuthenticated ? " text-green-800": " text-red-800")}>サーバー側ユーザー情報</h3>
-                  <div className={"space-y-1 text-sm " + (apiData.isAuthenticated ? " text-green-700": " text-red-700")}>
-                    <p><span className="font-medium">認証状態:</span> {apiData.isAuthenticated ? '認証済み' : '未認証'}</p>
-                    <p><span className="font-medium">ユーザーID:</span> {apiData.userId}</p>
-                    <p><span className="font-medium">名前:</span> {apiData.name}</p>
-                    <p><span className="font-medium">メール:</span> {apiData.email}</p>
-                    <p><span className="font-medium">プロバイダー:</span> {apiData.provider}</p>
-                    <p><span className="font-medium">ロール:</span> {apiData.roles.length > 0 ? apiData.roles.join(', ') : 'なし'}</p>
+                <div
+                  className={
+                    " rounded-lg p-4 text-left max-w-md mx-auto" +
+                    (apiData.isAuthenticated
+                      ? " bg-green-50 border border-green-200"
+                      : " bg-red-50 border border-red-200")
+                  }
+                >
+                  <h3
+                    className={
+                      "font-medium  mb-2" +
+                      (apiData.isAuthenticated
+                        ? " text-green-800"
+                        : " text-red-800")
+                    }
+                  >
+                    サーバー側ユーザー情報
+                  </h3>
+                  <div
+                    className={
+                      "space-y-1 text-sm " +
+                      (apiData.isAuthenticated
+                        ? " text-green-700"
+                        : " text-red-700")
+                    }
+                  >
+                    <p>
+                      <span className="font-medium">認証状態:</span>{" "}
+                      {apiData.isAuthenticated ? "認証済み" : "未認証"}
+                    </p>
+                    <p>
+                      <span className="font-medium">ユーザーID:</span>{" "}
+                      {apiData.userId}
+                    </p>
+                    <p>
+                      <span className="font-medium">名前:</span> {apiData.name}
+                    </p>
+                    <p>
+                      <span className="font-medium">メール:</span>{" "}
+                      {apiData.email}
+                    </p>
+                    <p>
+                      <span className="font-medium">プロバイダー:</span>{" "}
+                      {apiData.provider}
+                    </p>
+                    <p>
+                      <span className="font-medium">ロール:</span>{" "}
+                      {apiData.roles.length > 0
+                        ? apiData.roles.join(", ")
+                        : "なし"}
+                    </p>
                   </div>
                 </div>
               )}
             </div>
           </div>
-
 
           <div className="text-center text-gray-500">
             <p className="text-sm">
