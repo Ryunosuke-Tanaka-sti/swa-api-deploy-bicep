@@ -91,7 +91,7 @@ jobs:
       - name: Download Frontend Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: frontend-build
+          name: frontend-build-${{ needs.sanitize_branch_name.outputs.sanitized_name }}
           path: ./deploy/frontend
       - name: Copy Static Web App Configuration
         run: |
